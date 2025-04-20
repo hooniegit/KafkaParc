@@ -70,11 +70,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>mssql-jdbc</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.hooniegit</groupId>
 			<artifactId>Xerializer</artifactId>
 			<version>0.1.0</version>
