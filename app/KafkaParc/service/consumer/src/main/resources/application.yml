@@ -1,0 +1,41 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: KafkaConsumer
+
+  datasource:
+    # Tag Unit DataSource
+    tag:
+      jdbc-url: jdbc:sqlserver://workspace:1433;databaseName=ctc_kafka;encrypt=true;trustServerCertificate=true;
+      username: sa
+      password: '!@34qwer'
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+    # Group Unit DataSource
+    group:
+      jdbc-url: jdbc:sqlserver://workspace:1433;databaseName=ToolState;encrypt=true;trustServerCertificate=true;
+      username: sa
+      password: '!@34qwer'
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  kafka:
+    bootstrap-servers: workspace:9092
+    consumer:
+      group-id: AutoGeneration
+      topic: WAT
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      partition.assignment.strategy: org.apache.kafka.clients.consumer.CooperativeStickyAssignor
+      enable-auto-commit: true
+      auto-offset-reset: latest
+      fetch.min.bytes: 1024
+      max.poll.interval.ms: 60000
+      session.timeout.ms: 60000
+      request.timeout.ms: 60000
+      reconnect.backoff.ms: 1000
+      reconnect.backoff.max.ms: 10000
+
+  main:
+    allow-circular-references: true
