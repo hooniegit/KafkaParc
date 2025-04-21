@@ -80,15 +80,15 @@ public class KafkaConsumerService implements ConsumerSeekAware {
 
         this.nettyChannelClient.init_tag();
         this.nettyChannelClient.init_mode();
-        this.nettyChannelClient.init_state();
-        this.nettyChannelClient.init_statusOne();
-        this.nettyChannelClient.init_statusTwo();
+//        this.nettyChannelClient.init_state();
+//        this.nettyChannelClient.init_statusOne();
+//        this.nettyChannelClient.init_statusTwo();
 
         this.nettyChannelClient.sendData(pkg.getValue());
         this.nettyChannelClient.sendMode(pkg.getMode());
-        this.nettyChannelClient.sendState(pkg.getState());
-        this.nettyChannelClient.sendStatusOne(pkg.getStatusOne());
-        this.nettyChannelClient.sendStatusTwo(pkg.getStatusTwo());
+//        this.nettyChannelClient.sendState(pkg.getState());
+//        this.nettyChannelClient.sendStatusOne(pkg.getStatusOne());
+//        this.nettyChannelClient.sendStatusTwo(pkg.getStatusTwo());
 
         System.out.println(c.getHeader().get("timestamp"));
     }

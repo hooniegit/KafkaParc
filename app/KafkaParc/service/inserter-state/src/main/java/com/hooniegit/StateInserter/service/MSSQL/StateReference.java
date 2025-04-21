@@ -1,8 +1,12 @@
 package com.hooniegit.StateInserter.service.MSSQL;
 
+import com.hooniegit.SourceData.Interface.TagData;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -12,28 +16,47 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class StateReference {
 
-    // <id, index>
     @Getter
-    private ConcurrentHashMap<Integer, Integer> ids = new ConcurrentHashMap<>();
+    private final List<Integer> idList = new ArrayList<>();
 
-    // <group, [state, statusOne, statusTwo]>
     @Getter
-    private ConcurrentHashMap<Integer, Integer[]> groups = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, Integer> idMap = new ConcurrentHashMap<>();
 
-    /**
-     * update ids map
-     * @param ids
-     */
-    public void updateIds(ConcurrentHashMap<Integer, Integer> ids) {
-        this.ids = ids;
+    public void updateMap(List<TagData<Integer>> dataList) {
+        for (TagData<Integer> data : dataList) {
+            this.idMap.replace(data.getId(), data.getValue());
+        }
+
     }
 
     /**
-     * update groups map
-     * @param groups
+     * update ids map
+     * @param newList
      */
-    public void updateGroups(ConcurrentHashMap<Integer, Integer[]> groups) {
-        this.groups = groups;
+    public void update(List<Integer> newList) {
+        // Change List to Set
+        // Faster Lookup at .contains() (O(n) to O(1))
+        var oldIdSet = new HashSet<>(idList);
+        var newIdSet = new HashSet<>(newList);
+
+        // Add new ID (new - old)
+        for (Integer id : newIdSet) {
+            if (!oldIdSet.contains(id)) {
+                idList.add(id);
+                idMap.put(id, null);
+            }
+        }
+
+        // Remove old ID (old - new)
+        List<Integer> toRemove = new ArrayList<>();
+        for (Integer id : oldIdSet) {
+            if (!newIdSet.contains(id)) {
+                toRemove.add(id);
+                idMap.remove(id);
+            }
+        }
+        idList.removeAll(toRemove);
+        System.out.println("List & Map Data - UPDATE COMPLETE");
     }
 
 }

@@ -1,12 +1,20 @@
 package com.hooniegit.StateInserter.service.MSSQL;
 
+import com.hooniegit.SourceData.Interface.TagData;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -29,61 +37,73 @@ public class StateService {
 
     @PostConstruct
     public void initialTask() {
-        updateIds();
-        updateGroupIds();
+        update();
     }
 
-    @Scheduled(cron = "0 0/1 * * * ?")
-    public void periodicalTask() throws Exception{
-        updateIds();
-        updateGroupIds();
-    }
-
-    private void updateIds() {
+    private void update() {
+        // SELECT TagID & Create List
         String getSql = """
-            SELECT Tool_index, TagID 
-            FROM ToolState.dbo.TagList 
-            WHERE ToolState = 'State';
+        SELECT TagID 
+        FROM ToolState.dbo.TagList 
+        WHERE ToolState = 'StatusOne'
+        ORDER BY TagID ASC;
         """;
+        List<Integer> tagIdList = stateJdbcTemplate.query(getSql, (rs, rowNum) -> rs.getInt("TagID"));
 
-        referenceMap.updateIds(stateJdbcTemplate.query(getSql, rs -> {
-            ConcurrentHashMap<Integer, Integer> resultMap = new ConcurrentHashMap<>();
-            while (rs.next()) {
-                resultMap.put(rs.getInt("Tool_index"), rs.getInt("TagID"));
-            }
-            return resultMap;
-        }));
+        System.out.println(">> TagID List Size :: " + tagIdList.size());
+
+        // Update List if Database is Updated
+        this.referenceMap.update(tagIdList);
     }
 
-    private void updateGroupIds() {
+    /**
+     *
+     * @param dataList
+     */
+    public void check(List<TagData<Integer>> dataList) {
+        List<TagData<Integer>> entryList = new ArrayList<>();
+
+        // Check if Database is Updated
+        for (TagData<Integer> data : dataList) {
+            if (!this.referenceMap.getIdMap().get(data.getId()).equals(data.getValue())) {
+                System.out.println("[BF]" + this.referenceMap.getIdMap().get(data.getId()) + " -> [AF]" + data.getValue());
+                entryList.add(data);
+            }
+        }
+
+        // Insert Data & Update Map if Database is Updated
+        if (!entryList.isEmpty()) {
+            System.out.println(">> CHANGED DATA :: " + entryList.size());
+            this.referenceMap.updateMap(entryList);
+            insertMultipleRows(entryList);
+        }
+    }
+
+    /**
+     *
+     * @param dataList
+     */
+    protected void insertMultipleRows(List<TagData<Integer>> dataList) {
         String sql = """
-            SELECT Tool_index, 
-                   STRING_AGG(CAST(TagID AS VARCHAR), ',') 
-                       WITHIN GROUP (ORDER BY 
-                           CASE ToolState 
-                               WHEN 'StatusOne' THEN 1 
-                               WHEN 'StatusTwo' THEN 2 
-                               WHEN 'StatusThree' THEN 3 
-                           END 
-                       ) AS id_list 
-            FROM ToolState.dbo.TagList 
-            WHERE ToolState != 'State' 
-            GROUP BY Tool_index;
+        INSERT INTO TagValue (TagID, Timestamp, Value) 
+        VALUES (?, ?, ?)
         """;
 
-        referenceMap.updateGroups(stateJdbcTemplate.query(sql, rs -> {
-            ConcurrentHashMap<Integer, Integer[]> resultMap = new ConcurrentHashMap<>();
-            while (rs.next()) {
-                int groupId = rs.getInt("Tool_index");
-                String[] parts = rs.getString("id_list").split(",");
-                Integer[] ids = new Integer[parts.length];
-                for (int i = 0; i < parts.length; i++) {
-                    ids[i] = Integer.parseInt(parts[i]);
-                }
-                resultMap.put(groupId, ids);
+        stateJdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                TagData<Integer> row = dataList.get(i);
+                ps.setInt(1, row.getId());
+                ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.parse(row.getTimestamp())));
+                ps.setString(3, row.getValue().toString());
             }
-            return resultMap;
-        }));
+
+            @Override
+            public int getBatchSize() {
+                return dataList.size();
+            }
+        });
     }
+
 }
 

@@ -1,12 +1,12 @@
-package com.hooniegit.StatusOneInserter.service.MSSQL;
+package com.hooniegit.ModeInserter.service.MSSQL;
 
 import com.hooniegit.SourceData.Interface.TagData;
+
 import lombok.Getter;
+
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -22,17 +22,30 @@ public class StateReference {
     @Getter
     private ConcurrentHashMap<Integer, Boolean> idMap = new ConcurrentHashMap<>();
 
+    ////////////////// TASK /////////////////////
+
     public void updateMap(List<TagData<Boolean>> dataList) {
         for (TagData<Boolean> data : dataList) {
             this.idMap.replace(data.getId(), data.getValue());
         }
     }
 
+    ///////////////// UPDATE ////////////////////
+
+    public void intialize(ConcurrentHashMap<Integer, Boolean> idMap) {
+        this.idMap = idMap;
+    }
+
+    public void update(List<Integer> newList) {
+        updateListSchedule(newList);
+        updateMapSchedule(newList);
+    }
+
     /**
      * update ids map
      * @param newList
      */
-    public void update(List<Integer> newList) {
+    private void updateListSchedule(List<Integer> newList) {
         // Change List to Set
         // Faster Lookup at .contains() (O(n) to O(1))
         var oldIdSet = new HashSet<>(idList);
@@ -56,6 +69,18 @@ public class StateReference {
         }
         idList.removeAll(toRemove);
         System.out.println("List & Map Data - UPDATE COMPLETE");
+    }
+
+    private void updateMapSchedule(List<Integer> newList) {
+        if (this.idMap == null || newList == null || newList.isEmpty()) {
+            return;
+        }
+
+        for (Integer key : newList) {
+            if (!this.idMap.containsKey(key)) {
+                this.idMap.put(key, false);
+            }
+        }
     }
 
 }

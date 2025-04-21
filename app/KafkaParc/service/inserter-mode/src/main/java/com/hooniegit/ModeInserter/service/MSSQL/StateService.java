@@ -1,11 +1,13 @@
-package com.hooniegit.StatusTwoInserter.service.MSSQL;
+package com.hooniegit.ModeInserter.service.MSSQL;
 
 import com.hooniegit.SourceData.Interface.TagData;
+
 import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
@@ -14,12 +16,11 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * MSSQL
  */
-
 @Service
 public class StateService {
 
@@ -27,7 +28,7 @@ public class StateService {
     private final StateReference referenceMap;
 
     @Autowired
-    public StateService(@Qualifier("groupJdbcTemplate") JdbcTemplate jdbcTemplate,
+    public StateService(JdbcTemplate jdbcTemplate,
                         StateReference referenceMap) {
         this.stateJdbcTemplate = jdbcTemplate;
         this.referenceMap = referenceMap;
@@ -35,7 +36,30 @@ public class StateService {
 
     @PostConstruct
     public void initialTask() {
+        initialize();
         update();
+    }
+
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void periodicalTask() throws Exception {
+        update();
+    }
+
+    private void initialize() {
+        String getSql = """
+        SELECT TagID, Value
+        FROM ToolState.dbo.TagArchive
+        ORDER BY TagID ASC;
+        """;
+
+        referenceMap.intialize(stateJdbcTemplate.query(getSql, rs -> {
+            ConcurrentHashMap<Integer, Boolean> resultMap = new ConcurrentHashMap<>();
+            while (rs.next()) {
+                resultMap.put(rs.getInt("TagID"), rs.getBoolean("Value"));
+            }
+            return resultMap;
+        }));
+
     }
 
     private void update() {
@@ -43,7 +67,7 @@ public class StateService {
         String getSql = """
         SELECT TagID 
         FROM ToolState.dbo.TagList 
-        WHERE ToolState = 'StatusThree'
+        WHERE ToolState = 'State'
         ORDER BY TagID ASC;
         """;
         List<Integer> tagIdList = stateJdbcTemplate.query(getSql, (rs, rowNum) -> rs.getInt("TagID"));
@@ -104,4 +128,3 @@ public class StateService {
     }
 
 }
-

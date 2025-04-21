@@ -1,6 +1,9 @@
+server:
+  port: 13000
+
 spring:
   application:
-    name: StatusOneInserter
+    name: Archiver
 
   datasource:
     # Tag Unit DataSource
@@ -16,6 +19,3 @@ spring:
       username: sa
       password: '!@34qwer'
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
-server:
-  port: 13202

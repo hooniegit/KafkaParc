@@ -97,6 +97,7 @@
 	<modules>
 		<module>service/producer</module>
 		<module>service/consumer</module>
+		<module>service/archiver</module>
 		<module>service/transmitter</module>
 		<module>service/inserter-mode</module>
 		<module>service/inserter-state</module>

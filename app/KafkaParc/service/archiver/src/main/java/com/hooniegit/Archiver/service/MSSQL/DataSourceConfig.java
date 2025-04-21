@@ -1,4 +1,4 @@
-package com.hooniegit.StatusTwoInserter.service.MSSQL;
+package com.hooniegit.Archiver.service.MSSQL;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;

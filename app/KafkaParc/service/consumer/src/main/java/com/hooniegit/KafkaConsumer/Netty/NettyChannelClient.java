@@ -24,7 +24,7 @@ public class NettyChannelClient {
 
     private static final int CHANNEL_COUNT_tag = 16;
     private static final String HOST_tag = "localhost";
-    private static final int PORT_tag = 13001;
+    private static final int PORT_tag = 13500;
 
     private final List<Channel> channels_tag = new ArrayList<>(CHANNEL_COUNT_tag);
     private final NioEventLoopGroup group_tag = new NioEventLoopGroup();
@@ -35,7 +35,7 @@ public class NettyChannelClient {
 
     private static final int CHANNEL_COUNT_mode = 16;
     private static final String HOST_mode = "localhost";
-    private static final int PORT_mode = 13002;
+    private static final int PORT_mode = 13510;
 
     private final List<Channel> channels_mode = new ArrayList<>(CHANNEL_COUNT_mode);
     private final NioEventLoopGroup group_mode = new NioEventLoopGroup();
@@ -46,7 +46,7 @@ public class NettyChannelClient {
 
     private static final int CHANNEL_COUNT_state = 16;
     private static final String HOST_state = "localhost";
-    private static final int PORT_state = 13003;
+    private static final int PORT_state = 13511;
 
     private final List<Channel> channels_state = new ArrayList<>(CHANNEL_COUNT_state);
     private final NioEventLoopGroup group_state = new NioEventLoopGroup();
@@ -57,7 +57,7 @@ public class NettyChannelClient {
 
     private static final int CHANNEL_COUNT_statusOne = 16;
     private static final String HOST_statusOne = "localhost";
-    private static final int PORT_statusOne = 13004;
+    private static final int PORT_statusOne = 13512;
 
     private final List<Channel> channels_statusOne = new ArrayList<>(CHANNEL_COUNT_statusOne);
     private final NioEventLoopGroup group_statusOne = new NioEventLoopGroup();
@@ -68,7 +68,7 @@ public class NettyChannelClient {
 
     private static final int CHANNEL_COUNT_statusTwo = 16;
     private static final String HOST_statusTwo = "localhost";
-    private static final int PORT_statusTwo = 13005;
+    private static final int PORT_statusTwo = 13513;
 
     private final List<Channel> channels_statusTwo = new ArrayList<>(CHANNEL_COUNT_statusTwo);
     private final NioEventLoopGroup group_statusTwo = new NioEventLoopGroup();

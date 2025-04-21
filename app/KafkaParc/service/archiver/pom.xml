@@ -8,8 +8,8 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>ModeInserter</artifactId>
-<!--    <packaging>jar</packaging>-->
+    <artifactId>Archiver</artifactId>
+    <!--    <packaging>jar</packaging>-->
 
     <dependencies>
         <dependency>
@@ -17,11 +17,10 @@
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
         </dependency>
     </dependencies>
-    
+
 </project>

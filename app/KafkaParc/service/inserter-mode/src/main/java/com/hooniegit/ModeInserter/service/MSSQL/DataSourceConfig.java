@@ -12,16 +12,15 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
 
-    @Bean(name = "tagDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.tag")
-    public DataSource tagDataSource() {
+    @Bean(name = "groupDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.group")
+    public DataSource groupDataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean(name = "tagJdbcTemplate")
-    public JdbcTemplate tagJdbcTemplate(@Qualifier("tagDataSource") DataSource ds) {
+    @Bean(name = "groupJdbcTemplate")
+    public JdbcTemplate groupJdbcTemplate(@Qualifier("groupDataSource") DataSource ds) {
         return new JdbcTemplate(ds);
     }
-
 }
 
