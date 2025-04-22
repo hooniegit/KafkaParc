@@ -3,9 +3,9 @@ package com.hooniegit.StatusOneInserter.service.MSSQL;
 import com.hooniegit.SourceData.Interface.TagData;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
@@ -14,12 +14,11 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * MSSQL
  */
-
 @Service
 public class StateService {
 
@@ -27,7 +26,7 @@ public class StateService {
     private final StateReference referenceMap;
 
     @Autowired
-    public StateService(@Qualifier("groupJdbcTemplate") JdbcTemplate jdbcTemplate,
+    public StateService(JdbcTemplate jdbcTemplate,
                         StateReference referenceMap) {
         this.stateJdbcTemplate = jdbcTemplate;
         this.referenceMap = referenceMap;
@@ -35,7 +34,37 @@ public class StateService {
 
     @PostConstruct
     public void initialTask() {
+        initialize();
         update();
+    }
+
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void periodicalTask() throws Exception {
+        update();
+    }
+
+    private void initialize() {
+        String getSql = """
+        SELECT TagID, Value
+        FROM ToolState.dbo.Archive
+        WHERE TagID IN (
+            SELECT TagID
+            FROM ToolState.dbo.TagList
+            WHERE ToolState = 'StatusOne'
+        )
+        ORDER BY TagID ASC;
+        """;
+
+        referenceMap.intialize(stateJdbcTemplate.query(getSql, rs -> {
+            ConcurrentHashMap<Integer, String> resultMap = new ConcurrentHashMap<>();
+            while (rs.next()) {
+                resultMap.put(rs.getInt("TagID"), rs.getString("Value"));
+            }
+            return resultMap;
+        }));
+
+        System.out.println("Initialization Success : " + referenceMap.getIdMap().size());
+
     }
 
     private void update() {
@@ -43,7 +72,7 @@ public class StateService {
         String getSql = """
         SELECT TagID 
         FROM ToolState.dbo.TagList 
-        WHERE ToolState = 'StatusTwo'
+        WHERE ToolState = 'StatusOne'
         ORDER BY TagID ASC;
         """;
         List<Integer> tagIdList = stateJdbcTemplate.query(getSql, (rs, rowNum) -> rs.getInt("TagID"));
@@ -58,11 +87,11 @@ public class StateService {
      *
      * @param dataList
      */
-    public void check(List<TagData<Boolean>> dataList) {
-        List<TagData<Boolean>> entryList = new ArrayList<>();
+    public void check(List<TagData<String>> dataList) {
+        List<TagData<String>> entryList = new ArrayList<>();
 
         // Check if Database is Updated
-        for (TagData<Boolean> data : dataList) {
+        for (TagData<String> data : dataList) {
             if (!this.referenceMap.getIdMap().get(data.getId()).equals(data.getValue())) {
                 System.out.println("[BF]" + this.referenceMap.getIdMap().get(data.getId()) + " -> [AF]" + data.getValue());
                 entryList.add(data);
@@ -81,7 +110,7 @@ public class StateService {
      *
      * @param dataList
      */
-    protected void insertMultipleRows(List<TagData<Boolean>> dataList) {
+    protected void insertMultipleRows(List<TagData<String>> dataList) {
         String sql = """
         INSERT INTO TagValue (TagID, Timestamp, Value) 
         VALUES (?, ?, ?)
@@ -90,7 +119,7 @@ public class StateService {
         stateJdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                TagData<Boolean> row = dataList.get(i);
+                TagData<String> row = dataList.get(i);
                 ps.setInt(1, row.getId());
                 ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.parse(row.getTimestamp())));
                 ps.setString(3, row.getValue().toString());
@@ -104,4 +133,3 @@ public class StateService {
     }
 
 }
-

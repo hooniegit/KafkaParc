@@ -13,10 +13,13 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
 /**
- *
+ * Consumer Configuration
+ * - 64 Partitions to Receive
+ * - 64 Concurrency
  */
 @Configuration
 public class KafkaConsumerConfig {
+
     @Autowired
     private KafkaProperties kafkaProperties;
 
@@ -36,5 +39,6 @@ public class KafkaConsumerConfig {
 
         return factory;
     }
+
 }
 

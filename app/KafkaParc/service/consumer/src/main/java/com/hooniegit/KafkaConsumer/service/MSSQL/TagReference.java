@@ -6,18 +6,17 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
+ * Reference Data Component
+ * - Manage Reference Datas
  */
-
 @Component
 public class TagReference {
 
-    // <id, index>
     @Getter
     private ConcurrentHashMap<Integer, Integer> ids = new ConcurrentHashMap<>();
 
     /**
-     * update ids map
+     * Update Reference Datas
      * @param ids
      */
     public void updateIds(ConcurrentHashMap<Integer, Integer> ids) {

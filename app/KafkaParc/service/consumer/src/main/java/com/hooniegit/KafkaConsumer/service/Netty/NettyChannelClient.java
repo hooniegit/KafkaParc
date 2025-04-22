@@ -1,4 +1,4 @@
-package com.hooniegit.KafkaConsumer.Netty;
+package com.hooniegit.KafkaConsumer.service.Netty;
 
 import com.hooniegit.NettyDataProtocol.Tools.Decoder;
 import com.hooniegit.NettyDataProtocol.Tools.Encoder;
@@ -16,6 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Netty TCP Client Component
+ * - Manage Configurations
+ * - Initialize Connections
+ * - Send Datas to Netty Server
+ */
 @Component
 public class NettyChannelClient {
 
@@ -74,9 +80,8 @@ public class NettyChannelClient {
     private final NioEventLoopGroup group_statusTwo = new NioEventLoopGroup();
     private final AtomicInteger index_statusTwo = new AtomicInteger(0);
 
-    /**
-     *
-     */
+    // Initializers //////////////////////////////////////////////////
+
     public synchronized void init_tag() {
         if (initialized_tag) return;
 
@@ -106,9 +111,6 @@ public class NettyChannelClient {
         }
     }
 
-    /**
-     *
-     */
     public synchronized void init_mode() {
         if (initialized_mode) return;
 
@@ -136,12 +138,8 @@ public class NettyChannelClient {
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize channels", e);
         }
-
     }
 
-    /**
-     *
-     */
     public synchronized void init_state() {
         if (initialized_state) return;
 
@@ -169,12 +167,8 @@ public class NettyChannelClient {
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize channels", e);
         }
-
     }
 
-    /**
-     *
-     */
     public synchronized void init_statusOne() {
         if (initialized_statusOne) return;
 
@@ -201,11 +195,9 @@ public class NettyChannelClient {
             initialized_statusOne = true;
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize channels", e);
-        }}
+        }
+    }
 
-    /**
-     *
-     */
     public synchronized void init_statusTwo() {
         if (initialized_statusTwo) return;
 
@@ -235,10 +227,8 @@ public class NettyChannelClient {
         }
     }
 
-    /**
-     *
-     * @param data
-     */
+    // Data Transmitters //////////////////////////////////////////////////
+
     public void sendData(List<TagData<Double>> data) {
         if (!initialized_tag) {
             throw new IllegalStateException("Client not initialized. Call init() first.");
@@ -254,10 +244,6 @@ public class NettyChannelClient {
         }
     }
 
-    /**
-     *
-     * @param data
-     */
     public void sendMode(List<TagData<Boolean>> data) {
         if (!initialized_mode) {
             throw new IllegalStateException("Client not initialized. Call init() first.");
@@ -273,10 +259,6 @@ public class NettyChannelClient {
         }
     }
 
-    /**
-     *
-     * @param data
-     */
     public void sendState(List<TagData<Integer>> data) {
         if (!initialized_state) {
             throw new IllegalStateException("Client not initialized. Call init() first.");
@@ -292,10 +274,6 @@ public class NettyChannelClient {
         }
     }
 
-    /**
-     *
-     * @param data
-     */
     public void sendStatusOne(List<TagData<String>> data) {
         if (!initialized_statusOne) {
             throw new IllegalStateException("Client not initialized. Call init() first.");
@@ -311,10 +289,6 @@ public class NettyChannelClient {
         }
     }
 
-    /**
-     *
-     * @param data
-     */
     public void sendStatusTwo(List<TagData<String>> data) {
         if (!initialized_statusTwo) {
             throw new IllegalStateException("Client not initialized. Call init() first.");
@@ -330,9 +304,8 @@ public class NettyChannelClient {
         }
     }
 
-    /**
-     *
-     */
+    // Others //////////////////////////////////////////////////
+    
     @PreDestroy
     public void shutdown() {
         for (Channel channel : channels_tag) {

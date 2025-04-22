@@ -37,15 +37,6 @@ public class StateReference {
     }
 
     public void update(List<Integer> newList) {
-        updateListSchedule(newList);
-        updateMapSchedule(newList);
-    }
-
-    /**
-     * update ids map
-     * @param newList
-     */
-    private void updateListSchedule(List<Integer> newList) {
         // Change List to Set
         // Faster Lookup at .contains() (O(n) to O(1))
         var oldIdSet = new HashSet<>(idList);
@@ -68,19 +59,7 @@ public class StateReference {
             }
         }
         idList.removeAll(toRemove);
-        System.out.println("List & Map Data - UPDATE COMPLETE");
-    }
-
-    private void updateMapSchedule(List<Integer> newList) {
-        if (this.idMap == null || newList == null || newList.isEmpty()) {
-            return;
-        }
-
-        for (Integer key : newList) {
-            if (!this.idMap.containsKey(key)) {
-                this.idMap.put(key, false);
-            }
-        }
+        System.out.println("[Map/List] Update Complete : " + idMap.size() + ", " + idList.size());
     }
 
 }

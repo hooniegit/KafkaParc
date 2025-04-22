@@ -48,7 +48,12 @@ public class StateService {
     private void initialize() {
         String getSql = """
         SELECT TagID, Value
-        FROM ToolState.dbo.TagArchive
+        FROM ToolState.dbo.Archive
+        WHERE TagID IN (
+            SELECT TagID
+            FROM ToolState.dbo.TagList
+            WHERE ToolState = 'State'
+        )
         ORDER BY TagID ASC;
         """;
 
@@ -59,6 +64,8 @@ public class StateService {
             }
             return resultMap;
         }));
+
+        System.out.println("[Map] Initialization Success : " + referenceMap.getIdMap().size());
 
     }
 
@@ -72,10 +79,10 @@ public class StateService {
         """;
         List<Integer> tagIdList = stateJdbcTemplate.query(getSql, (rs, rowNum) -> rs.getInt("TagID"));
 
-        System.out.println(">> TagID List Size :: " + tagIdList.size());
-
         // Update List if Database is Updated
         this.referenceMap.update(tagIdList);
+
+        System.out.println("[List] Initialization Success : " + referenceMap.getIdList().size());
     }
 
     /**

@@ -9,6 +9,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
+/**
+ * Database Source Configuration (Default)
+ * - Need to Configure application.yml properties
+ */
 @Configuration
 public class DataSourceConfig {
 
@@ -33,5 +37,6 @@ public class DataSourceConfig {
     public JdbcTemplate groupJdbcTemplate(@Qualifier("groupDataSource") DataSource ds) {
         return new JdbcTemplate(ds);
     }
+
 }
 

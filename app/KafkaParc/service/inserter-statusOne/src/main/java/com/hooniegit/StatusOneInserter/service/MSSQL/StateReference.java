@@ -20,12 +20,20 @@ public class StateReference {
     private final List<Integer> idList = new ArrayList<>();
 
     @Getter
-    private ConcurrentHashMap<Integer, Boolean> idMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, String> idMap = new ConcurrentHashMap<>();
 
-    public void updateMap(List<TagData<Boolean>> dataList) {
-        for (TagData<Boolean> data : dataList) {
+    ////////////////// TASK /////////////////////
+
+    public void updateMap(List<TagData<String>> dataList) {
+        for (TagData<String> data : dataList) {
             this.idMap.replace(data.getId(), data.getValue());
         }
+    }
+
+    ///////////////// UPDATE ////////////////////
+
+    public void intialize(ConcurrentHashMap<Integer, String> idMap) {
+        this.idMap = idMap;
     }
 
     /**
@@ -42,7 +50,7 @@ public class StateReference {
         for (Integer id : newIdSet) {
             if (!oldIdSet.contains(id)) {
                 idList.add(id);
-                idMap.put(id, false);
+                idMap.put(id, "DEFAULT");
             }
         }
 

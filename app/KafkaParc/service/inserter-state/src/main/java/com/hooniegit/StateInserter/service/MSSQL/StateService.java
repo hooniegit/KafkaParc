@@ -3,7 +3,6 @@ package com.hooniegit.StateInserter.service.MSSQL;
 import com.hooniegit.SourceData.Interface.TagData;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,11 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * MSSQL
  */
-
 @Service
 public class StateService {
 
@@ -29,7 +26,7 @@ public class StateService {
     private final StateReference referenceMap;
 
     @Autowired
-    public StateService(@Qualifier("groupJdbcTemplate") JdbcTemplate jdbcTemplate,
+    public StateService(JdbcTemplate jdbcTemplate,
                         StateReference referenceMap) {
         this.stateJdbcTemplate = jdbcTemplate;
         this.referenceMap = referenceMap;
@@ -37,7 +34,37 @@ public class StateService {
 
     @PostConstruct
     public void initialTask() {
+        initialize();
         update();
+    }
+
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void periodicalTask() throws Exception {
+        update();
+    }
+
+    private void initialize() {
+        String getSql = """
+        SELECT TagID, Value
+        FROM ToolState.dbo.Archive
+        WHERE TagID IN (
+            SELECT TagID
+            FROM ToolState.dbo.TagList
+            WHERE ToolState = 'StatusOne'
+        )
+        ORDER BY TagID ASC;
+        """;
+
+        referenceMap.initialize(stateJdbcTemplate.query(getSql, rs -> {
+            ConcurrentHashMap<Integer, Integer> resultMap = new ConcurrentHashMap<>();
+            while (rs.next()) {
+                resultMap.put(rs.getInt("TagID"), rs.getInt("Value"));
+            }
+            return resultMap;
+        }));
+
+        System.out.println("Initialization Success : " + referenceMap.getIdMap().size());
+
     }
 
     private void update() {
@@ -106,4 +133,3 @@ public class StateService {
     }
 
 }
-

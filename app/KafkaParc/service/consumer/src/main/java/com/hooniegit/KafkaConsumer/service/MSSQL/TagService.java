@@ -9,11 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
- * MSSQL
+ * MSSQL Service for Tag Unit
+ * - [Periodical] Update Reference Datas
  */
-
 @Service
 public class TagService {
 
@@ -27,12 +26,18 @@ public class TagService {
         this.referenceMap = referenceMap;
     }
 
+    /**
+     * [Init] Run Update Task
+     */
     @PostConstruct
     public void initialTask() {
         updateIds();
     }
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+    /**
+     * [Cron] Run Update Task for Every 3 Minutes
+     */
+    @Scheduled(cron = "0 0/3 * * * ?")
     public void periodicalTask() {
         try {
             updateIds();
@@ -41,6 +46,9 @@ public class TagService {
         }
     }
 
+    /**
+     * Update Reference Datas
+     */
     private void updateIds() {
         String getSql = """
             SELECT paramid, id 

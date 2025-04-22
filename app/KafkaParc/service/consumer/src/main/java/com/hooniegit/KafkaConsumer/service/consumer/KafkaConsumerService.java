@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.hooniegit.KafkaConsumer.service.MSSQL.TagReference;
 import com.hooniegit.KafkaConsumer.service.MSSQL.StateReference;
-import com.hooniegit.KafkaConsumer.Netty.NettyChannelClient;
+import com.hooniegit.KafkaConsumer.service.Netty.NettyChannelClient;
 
 // Nexus Dependencies
 import com.hooniegit.SourceData.Source.Data;
@@ -50,9 +50,7 @@ public class KafkaConsumerService implements ConsumerSeekAware {
     @Autowired
     private TagReference tagReference;
 
-
-    // Utils //////////////////////////////////////////////////////////////////////////////
-
+    // Utils //////////////////////////////////////////////////
 
     /**
      * Re-Set Offset Data to Newest.
@@ -78,18 +76,21 @@ public class KafkaConsumerService implements ConsumerSeekAware {
         // Re-Factor
         Package pkg = generatePackage(c.getBody(), c.getHeader().get("timestamp").toString());
 
+        // Initialize Netty Client
         this.nettyChannelClient.init_tag();
         this.nettyChannelClient.init_mode();
 //        this.nettyChannelClient.init_state();
 //        this.nettyChannelClient.init_statusOne();
 //        this.nettyChannelClient.init_statusTwo();
 
+        // Transmit Dataset Based-On Netty TCP
         this.nettyChannelClient.sendData(pkg.getValue());
         this.nettyChannelClient.sendMode(pkg.getMode());
 //        this.nettyChannelClient.sendState(pkg.getState());
 //        this.nettyChannelClient.sendStatusOne(pkg.getStatusOne());
 //        this.nettyChannelClient.sendStatusTwo(pkg.getStatusTwo());
 
+        // Test
         System.out.println(c.getHeader().get("timestamp"));
     }
 
@@ -162,9 +163,7 @@ public class KafkaConsumerService implements ConsumerSeekAware {
         clientSocket[index].send(packet);
     }
 
-
-    // Kafka Listeners ///////////////////////////////////////////////////////////////////
-
+    // Kafka Listeners //////////////////////////////////////////////////
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "WAT", partitions = {"0"}),
             containerFactory = "kafkaListenerContainerFactory")

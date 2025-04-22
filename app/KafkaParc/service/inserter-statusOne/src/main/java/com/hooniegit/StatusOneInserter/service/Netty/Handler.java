@@ -10,7 +10,7 @@ import java.util.List;
 /**
  *
  */
-public class Handler extends DefaultHandler<TagData<Boolean>> {
+public class Handler extends DefaultHandler<TagData<String>> {
 
     private final StateService service;
 
@@ -23,7 +23,7 @@ public class Handler extends DefaultHandler<TagData<Boolean>> {
      * @param msg
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, List<TagData<Boolean>> msg) {
+    protected void channelRead0(ChannelHandlerContext ctx, List<TagData<String>> msg) {
         System.out.println("Received " + msg.size() + " tags");
         this.service.check(msg);
     }

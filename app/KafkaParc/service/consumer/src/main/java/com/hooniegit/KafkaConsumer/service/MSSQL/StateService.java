@@ -9,11 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
- * MSSQL
+ * MSSQL Service for Group Unit
+ * - [Periodical] Update Reference Datas(List, Map)
  */
-
 @Service
 public class StateService {
 
@@ -27,18 +26,28 @@ public class StateService {
         this.referenceMap = referenceMap;
     }
 
+    /**
+     * [Init] Run Update Tasks
+     */
     @PostConstruct
     public void initialTask() {
         updateIds();
         updateGroupIds();
     }
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+    /**
+     * [Cron] Run Update Tasks Every 3 Minutes
+     * @throws Exception
+     */
+    @Scheduled(cron = "0 0/3 * * * ?")
     public void periodicalTask() throws Exception{
         updateIds();
         updateGroupIds();
     }
 
+    /**
+     * Update Tag Reference List
+     */
     private void updateIds() {
         String getSql = """
             SELECT Tool_index, TagID 
@@ -55,6 +64,9 @@ public class StateService {
         }));
     }
 
+    /**
+     * Update Group Reference List
+     */
     private void updateGroupIds() {
         String sql = """
             SELECT Tool_index, 
@@ -85,5 +97,5 @@ public class StateService {
             return resultMap;
         }));
     }
-}
 
+}

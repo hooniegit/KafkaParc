@@ -22,17 +22,20 @@ public class StateReference {
     @Getter
     private ConcurrentHashMap<Integer, Integer> idMap = new ConcurrentHashMap<>();
 
+    ////////////////// TASK /////////////////////
+
     public void updateMap(List<TagData<Integer>> dataList) {
         for (TagData<Integer> data : dataList) {
             this.idMap.replace(data.getId(), data.getValue());
         }
-
     }
 
-    /**
-     * update ids map
-     * @param newList
-     */
+    ///////////////// UPDATE ////////////////////
+
+    public void initialize(ConcurrentHashMap<Integer, Integer> idMap) {
+        this.idMap = idMap;
+    }
+
     public void update(List<Integer> newList) {
         // Change List to Set
         // Faster Lookup at .contains() (O(n) to O(1))
@@ -43,7 +46,7 @@ public class StateReference {
         for (Integer id : newIdSet) {
             if (!oldIdSet.contains(id)) {
                 idList.add(id);
-                idMap.put(id, null);
+                idMap.put(id, 500);
             }
         }
 

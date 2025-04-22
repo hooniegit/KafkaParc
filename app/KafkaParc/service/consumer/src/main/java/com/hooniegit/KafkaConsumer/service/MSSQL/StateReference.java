@@ -9,7 +9,6 @@ import lombok.Getter;
 /**
  *
  */
-
 @Component
 public class StateReference {
 

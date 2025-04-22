@@ -14,7 +14,7 @@ public class NettyServer {
     @Autowired
     private StateService service;
 
-    private Server<TagData<Boolean>> nettyServer;
+    private Server<TagData<String>> nettyServer;
 
     @PostConstruct
     public void start() throws Exception {

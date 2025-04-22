@@ -8,9 +8,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
- * MSSQL
+ * MSSQL Service
+ * - [Periodical] Update Archive Table
  */
-
 @Service
 public class StateService {
 
@@ -21,19 +21,28 @@ public class StateService {
         this.stateJdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Initialization :: Run Update Task
+     */
     @PostConstruct
     public void initialTask() {
-        update();
+        update("Init");
     }
 
+    /**
+     * Scheduled :: Run Update Task for Every 3 Minutes
+     */
     @Scheduled(cron = "0 0/3 * * * ?")
     public void periodicalTask() {
-        update();
+        update("Cron");
     }
 
-    protected void update() {
+    /**
+     * Task Method :: Update Archive Table
+     */
+    protected void update(String type) {
         String sql = """
-            MERGE INTO TagArchive AS target
+            MERGE INTO Archive AS target
             USING (
                 SELECT
                     TagID,
@@ -53,7 +62,7 @@ public class StateService {
         """;
 
         stateJdbcTemplate.update(sql);
-        System.out.println("Database Updated Successfully");
+        System.out.println("[" + type + "] Database Updated Successfully");
     }
 
 }
