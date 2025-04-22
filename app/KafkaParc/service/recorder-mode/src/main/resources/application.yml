@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ModeRecorder
+
+  datasource:
+    # Tag Unit DataSource
+    tag:
+      jdbc-url: jdbc:sqlserver://workspace:1433;databaseName=ctc_kafka;encrypt=true;trustServerCertificate=true;
+      username: sa
+      password: '!@34qwer'
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+    # Group Unit DataSource
+    group:
+      jdbc-url: jdbc:sqlserver://workspace:1433;databaseName=ToolState;encrypt=true;trustServerCertificate=true;
+      username: sa
+      password: '!@34qwer'
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+server:
+  port: 13200

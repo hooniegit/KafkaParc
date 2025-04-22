@@ -305,7 +305,7 @@ public class NettyChannelClient {
     }
 
     // Others //////////////////////////////////////////////////
-    
+
     @PreDestroy
     public void shutdown() {
         for (Channel channel : channels_tag) {

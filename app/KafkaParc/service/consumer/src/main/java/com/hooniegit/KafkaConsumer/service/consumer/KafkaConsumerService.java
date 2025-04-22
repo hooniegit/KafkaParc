@@ -77,18 +77,18 @@ public class KafkaConsumerService implements ConsumerSeekAware {
         Package pkg = generatePackage(c.getBody(), c.getHeader().get("timestamp").toString());
 
         // Initialize Netty Client
-        this.nettyChannelClient.init_tag();
-        this.nettyChannelClient.init_mode();
+//        this.nettyChannelClient.init_tag();
+//        this.nettyChannelClient.init_mode();
 //        this.nettyChannelClient.init_state();
 //        this.nettyChannelClient.init_statusOne();
-//        this.nettyChannelClient.init_statusTwo();
+        this.nettyChannelClient.init_statusTwo();
 
         // Transmit Dataset Based-On Netty TCP
-        this.nettyChannelClient.sendData(pkg.getValue());
-        this.nettyChannelClient.sendMode(pkg.getMode());
+//        this.nettyChannelClient.sendData(pkg.getValue());
+//        this.nettyChannelClient.sendMode(pkg.getMode());
 //        this.nettyChannelClient.sendState(pkg.getState());
 //        this.nettyChannelClient.sendStatusOne(pkg.getStatusOne());
-//        this.nettyChannelClient.sendStatusTwo(pkg.getStatusTwo());
+        this.nettyChannelClient.sendStatusTwo(pkg.getStatusTwo());
 
         // Test
         System.out.println(c.getHeader().get("timestamp"));
@@ -139,10 +139,10 @@ public class KafkaConsumerService implements ConsumerSeekAware {
             if (prevGroup != group) {
                 // Check If Group Exists
                 if (stateReference.getGroups().containsKey(group)) {
-                    int group_index = stateReference.getGroups().get(group)[0];
-                    states.add( new TagData<Integer>(group_index, b.getState().getValue(), timestamp) );
-                    statusOnes.add( new TagData<String>(group_index, stateReference.getGroups().get(group)[1].toString(), timestamp) );
-                    statusTwos.add( new TagData<String>(group_index, stateReference.getGroups().get(group)[2].toString(), timestamp) );
+                    Integer[] groupArray = stateReference.getGroups().get(group);
+                    states.add( new TagData<Integer>(groupArray[0], b.getState().getValue(), timestamp) );
+                    statusOnes.add( new TagData<String>(groupArray[1], b.getStatusOne(), timestamp) );
+                    statusTwos.add( new TagData<String>(groupArray[2], b.getStatusTwo(), timestamp) );
                     prevGroup = group;
                 }
             }

@@ -99,10 +99,11 @@
 		<module>service/consumer</module>
 		<module>service/archiver</module>
 		<module>service/transmitter</module>
-		<module>service/inserter-mode</module>
-		<module>service/inserter-state</module>
-		<module>service/inserter-statusOne</module>
-		<module>service/inserter-statusTwo</module>
+		<module>service/recorder-mode</module>
+		<module>service/recorder-state</module>
+		<module>service/recorder-statusOne</module>
+		<module>service/recorder-statusTwo</module>
+		<module>service/inserter</module>
 	</modules>
 
 	<build>
